@@ -35,18 +35,27 @@ jobs:
           path: ./build
           include-hidden-files: true  # Set to true if you need to include hidden files
 
-  deploy:
+   deploy:
     name: Deploy
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Debug - List all available artifacts before downloading
+        run: ls -R ${{ github.workspace }}/
+
       - name: Download artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v4  
         with:
-          name: production-files  # ✅ This must match the upload step
+          name: production-files  
           path: ./build
+
+      - name: Verify downloaded files
+        run: ls -la ./build  
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
