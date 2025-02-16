@@ -31,9 +31,9 @@ jobs:
       - name: Upload production-ready build files
         uses: actions/upload-artifact@v4
         with:
-          name: production-files
+          name: production-files  # Static name
           path: ./build
-          include-hidden-files: true  # Set to true if you need to include hidden files
+          include-hidden-files: true
 
   deploy:
     name: Deploy
@@ -51,7 +51,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4  
         with:
-          name: production-files  
+          name: production-files  # Match the static name
           path: ./build
 
       - name: Verify downloaded files
