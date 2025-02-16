@@ -31,6 +31,9 @@ jobs:
       - name: Build project
         run: npm run build
 
+      - name: List build directory contents
+        run: ls -la ./build
+
       - name: Upload production-ready build files
         id: upload
         uses: actions/upload-artifact@v4
@@ -49,8 +52,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Debug - List all available artifacts before downloading
-        run: ls -R ${{ github.workspace }}/
+      - name: Debug - Print artifact name
+        run: echo "Artifact name: ${{ needs.build.outputs.artifact_name }}"
 
       - name: Download artifact
         uses: actions/download-artifact@v4  
