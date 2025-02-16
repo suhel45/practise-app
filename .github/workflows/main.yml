@@ -1,71 +1,77 @@
-name: Build & Deploy of the practice app
+name: React App CI/CD
 
 on:
   push:
     branches:
-      - main
+      - main  # Trigger on pushes to the main branch
+  pull_request:
+    branches:
+      - main  # Trigger on pull requests targeting the main branch
 
 env:
-  CI: false
+  CI: true  # Set CI environment variable to true
 
-jobs:  
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-
-    outputs:
-      artifact_name: ${{ steps.upload.outputs.artifact_name }}
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest  # Use the latest Ubuntu runner
 
     steps:
+      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      # Step 2: Set up Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 18  # Use Node.js version 18 (or your preferred version)
+          cache: 'npm'       # Cache npm dependencies to speed up builds
 
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: npm install
 
+      # Step 4: Run tests (if you have tests configured)
+      - name: Run tests
+        run: npm test
+
+      # Step 5: Build the React app
       - name: Build project
         run: npm run build
 
-      - name: List build directory contents
-        run: ls -la ./build
-
-      - name: Upload production-ready build files
-        id: upload
+      # Step 6: Upload build artifacts
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: production-files-${{ github.run_id }}  # Dynamic name
-          path: ./build
-          include-hidden-files: true
+          name: build
+          path: ./build  # Upload the build directory as an artifact
 
   deploy:
-    name: Deploy
-    needs: build
+    name: Deploy to GitHub Pages
+    needs: build-and-test  # Wait for the build-and-test job to complete
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'  # Only deploy on pushes to the main branch
 
     steps:
+      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Debug - Print artifact name
-        run: echo "Artifact name: ${{ needs.build.outputs.artifact_name }}"
-
-      - name: Download artifact
-        uses: actions/download-artifact@v4  
+      # Step 2: Download build artifacts
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
         with:
-          name: ${{ needs.build.outputs.artifact_name }}  # Use dynamic name
+          name: build
           path: ./build
 
+      # Step 3: Verify downloaded files
       - name: Verify downloaded files
-        run: ls -la ./build  
+        run: ls -la ./build
 
+      # Step 4: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.TOKEN }}
-          publish_dir: ./build
+          github_token: ${{ secrets.TOKEN }}  # Use the default GitHub token
+          publish_dir: ./build  # Deploy the contents of the build directory
