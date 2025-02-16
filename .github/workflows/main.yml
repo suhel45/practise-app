@@ -13,6 +13,9 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
 
+    outputs:
+      artifact_name: ${{ steps.upload.outputs.artifact_name }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -29,9 +32,10 @@ jobs:
         run: npm run build
 
       - name: Upload production-ready build files
+        id: upload
         uses: actions/upload-artifact@v4
         with:
-          name: production-files  # Static name
+          name: production-files-${{ github.run_id }}  # Dynamic name
           path: ./build
           include-hidden-files: true
 
@@ -51,7 +55,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4  
         with:
-          name: production-files  # Match the static name
+          name: ${{ needs.build.outputs.artifact_name }}  # Use dynamic name
           path: ./build
 
       - name: Verify downloaded files
