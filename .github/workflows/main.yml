@@ -3,7 +3,7 @@ name: Build & Deploy of the pracise app
 on:
   push:
     branches:
-      - dev
+      - main
       
 env:
   CI: false
@@ -20,7 +20,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v1
         with:
-          node-version: 18
+          node-version: 16
 
       - name: Install dependencies
         uses: bahmutov/npm-install@v1
@@ -38,7 +38,7 @@ jobs:
     name: Deploy
     needs: build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/dev'
+    if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Download artifact
