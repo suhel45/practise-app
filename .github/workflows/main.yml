@@ -31,11 +31,11 @@ jobs:
       - name: Upload production-ready build files
         uses: actions/upload-artifact@v4
         with:
-          name: production-files-${{ github.run_id }}
+          name: production-files
           path: ./build
           include-hidden-files: true  # Set to true if you need to include hidden files
 
-   deploy:
+  deploy:
     name: Deploy
     needs: build
     runs-on: ubuntu-latest
