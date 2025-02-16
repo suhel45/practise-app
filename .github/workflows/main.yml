@@ -8,7 +8,7 @@ on:
 env:
   CI: false
 
-jobs:  # <-- Ensure this is at the correct indentation level
+jobs:  
   build:
     name: Build
     runs-on: ubuntu-latest
