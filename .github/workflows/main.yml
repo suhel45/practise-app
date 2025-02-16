@@ -23,16 +23,17 @@ jobs:
           node-version: 16
 
       - name: Install dependencies
-        uses: bahmutov/npm-install@v1
+        run: npm install
 
       - name: Build project
         run: npm run build
 
       - name: Upload production-ready build files
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: production-files
+          name: production-files-${{ github.run_id }}
           path: ./build
+          include-hidden-files: true  # Set to true if you need to include hidden files
 
   deploy:
     name: Deploy
@@ -42,9 +43,9 @@ jobs:
 
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: production-files
+          name: production-files-${{ github.run_id }}
           path: ./build
 
       - name: Deploy to GitHub Pages
