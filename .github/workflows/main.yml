@@ -3,71 +3,68 @@ name: React App CI/CD
 on:
   push:
     branches:
-      - main  # Trigger on pushes to the main branch
+      - main
   pull_request:
     branches:
-      - main  # Trigger on pull requests targeting the main branch
+      - main
 
 env:
-  CI: true  # Set CI environment variable to true
+  CI: true
 
 jobs:
   build-and-test:
     name: Build and Test
-    runs-on: ubuntu-latest  # Use the latest Ubuntu runner
+    runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Set up Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18  # Use Node.js version 18 (or your preferred version)
-          cache: 'npm'       # Cache npm dependencies to speed up builds
+          node-version: 18
+          cache: 'npm'
 
-      # Step 3: Install dependencies
       - name: Install dependencies
         run: npm install
 
-      # Step 5: Build the React app
       - name: Build project
         run: npm run build
 
-      # Step 6: Upload build artifacts
+      - name: List build directory contents
+        run: ls -la ./build
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build
-          path: ./build  # Upload the build directory as an artifact
+          path: ./build
 
   deploy:
     name: Deploy to GitHub Pages
-    needs: build-and-test  # Wait for the build-and-test job to complete
+    needs: build-and-test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'  # Only deploy on pushes to the main branch
+    if: github.ref == 'refs/heads/main'
 
     steps:
-      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Download build artifacts
+      - name: Debug - Print artifact name
+        run: echo "Artifact name: build"
+
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
           name: build
           path: ./build
 
-      # Step 3: Verify downloaded files
       - name: Verify downloaded files
         run: ls -la ./build
 
-      # Step 4: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.TOKEN }}  # Use the default GitHub token
-          publish_dir: ./build  # Deploy the contents of the build directory
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
