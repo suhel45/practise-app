@@ -6,6 +6,7 @@ interface messageData {
     error?:string,
 }
 const handleSubmit  = async(state: string | undefined | object , formData: FormData):Promise<string | undefined | object>=>{
+    console.log(state)
     const name = formData.get("name");
     const email = formData.get("email");
     await new Promise(res=>setTimeout(res,2000));
